@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Wheel of Destiny</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap');
+
+  :root{
+    --velvet-deep:#1a0e2e;
+    --velvet-mid:#2d1650;
+    --gold:#d4af37;
+    --gold-bright:#f4d76b;
+    --ember:#b5493a;
+    --parchment:#f3e6c8;
+    --smoke:#8a7ba8;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 50% 20%, #3a1d5e 0%, var(--velvet-deep) 55%, #0d0618 100%);
+    font-family:'Cormorant Garamond', serif;
+    color:var(--parchment);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* drifting stars */
+  .stars{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+  }
+  .stars span{
+    position:absolute; width:2px; height:2px; background:var(--gold-bright);
+    border-radius:50%; opacity:.5; animation:twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle{ 0%,100%{opacity:.15;} 50%{opacity:.8;} }
+
+  .booth{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:560px;
+    background:linear-gradient(160deg, var(--velvet-mid), #21103c 70%);
+    border:1px solid rgba(212,175,55,.35);
+    border-radius:18px;
+    padding:40px 36px 34px;
+    box-shadow:
+      0 0 0 1px rgba(212,175,55,.08),
+      0 30px 60px -20px rgba(0,0,0,.7),
+      inset 0 0 80px rgba(180,90,220,.06);
+  }
+
+  .booth::before, .booth::after{
+    content:"";
+    position:absolute;
+    width:34px; height:34px;
+    border:1px solid rgba(212,175,55,.5);
+    border-radius:50%;
+  }
+  .booth::before{ top:14px; left:14px; border-right:none; border-bottom:none; width:40px; height:40px; border-radius:0; border-top:2px solid var(--gold); border-left:2px solid var(--gold); opacity:.6;}
+  .booth::after{ bottom:14px; right:14px; width:40px; height:40px; border-radius:0; border-bottom:2px solid var(--gold); border-right:2px solid var(--gold); opacity:.6;}
+
+  .eyebrow{
+    text-align:center;
+    color:var(--smoke);
+    font-family:'Share Tech Mono', monospace;
+    font-size:11px;
+    letter-spacing:.3em;
+    margin-bottom:6px;
+  }
+
+  h1{
+    font-family:'Cinzel Decorative', serif;
+    text-align:center;
+    font-size:clamp(26px, 5vw, 36px);
+    color:var(--gold);
+    text-shadow:0 0 18px rgba(212,175,55,.4);
+    line-height:1.25;
+    margin-bottom:6px;
+  }
+
+  .sub{
+    text-align:center;
+    font-style:italic;
+    color:var(--smoke);
+    font-size:17px;
+    margin-bottom:28px;
+  }
+
+  .divider{
+    width:80px; height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin:0 auto 28px;
+  }
+
+  /* Wheel */
+  .wheel-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:28px;
+    position:relative;
+  }
+  .wheel-pointer{
+    position:absolute;
+    top:-6px; left:50%; transform:translateX(-50%);
+    width:0; height:0;
+    border-left:11px solid transparent;
+    border-right:11px solid transparent;
+    border-top:18px solid var(--gold-bright);
+    z-index:3;
+    filter:drop-shadow(0 0 6px rgba(244,215,107,.7));
+  }
+  .wheel{
+    width:220px; height:220px;
+    border-radius:50%;
+    position:relative;
+    border:4px solid var(--gold);
+    box-shadow:0 0 0 6px var(--velvet-deep), 0 0 30px rgba(180,90,220,.35);
+    background:conic-gradient(
+      #4a1f73 0deg 45deg,
+      #6d2a5f 45deg 90deg,
+      #4a1f73 90deg 135deg,
+      #6d2a5f 135deg 180deg,
+      #4a1f73 180deg 225deg,
+      #6d2a5f 225deg 270deg,
+      #4a1f73 270deg 315deg,
+      #6d2a5f 315deg 360deg
+    );
+    transition: transform 3.2s cubic-bezier(.15,.85,.25,1);
+  }
+  .wheel-center{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:34px; height:34px; border-radius:50%;
+    background:radial-gradient(circle, var(--gold-bright), var(--gold));
+    box-shadow:0 0 14px rgba(244,215,107,.8);
+    z-index:2;
+  }
+
+  button{
+    font-family:'Cinzel Decorative', serif;
+    font-size:14px;
+    letter-spacing:.08em;
+    display:block;
+    margin:0 auto;
+    background:linear-gradient(180deg, var(--ember), #7d2c21);
+    color:var(--parchment);
+    border:1px solid rgba(244,215,107,.5);
+    padding:13px 30px;
+    border-radius:30px;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,0,0,.4);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  button:hover{ transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.5); }
+  button:disabled{ opacity:.5; cursor:default; transform:none; }
+
+  .fortune-box{
+    margin-top:26px;
+    min-height:70px;
+    text-align:center;
+    font-size:19px;
+    font-style:italic;
+    color:var(--parchment);
+    padding:0 8px;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .fortune-box.show{ opacity:1; transform:translateY(0); }
+
+  /* "customize" dropdown — the cover job */
+  .customize{
+    margin-top:32px;
+    border-top:1px solid rgba(212,175,55,.2);
+    padding-top:22px;
+    text-align:center;
+  }
+  .customize label{
+    display:block;
+    font-family:'Share Tech Mono', monospace;
+    font-size:11px;
+    letter-spacing:.2em;
+    color:var(--smoke);
+    margin-bottom:10px;
+  }
+  select{
+    font-family:'Cormorant Garamond', serif;
+    font-size:16px;
+    background:rgba(0,0,0,.25);
+    color:var(--parchment);
+    border:1px solid rgba(212,175,55,.4);
+    border-radius:8px;
+    padding:9px 14px;
+    min-width:160px;
+    outline:none;
+  }
+  select:focus{ border-color:var(--gold-bright); }
+  .customize-note{
+    margin-top:10px;
+    font-size:13px;
+    color:var(--smoke);
+    font-style:italic;
+  }
+
+  /* Glitch overlay */
+  #meltdown{
+    position:fixed; inset:0;
+    background:#000;
+    z-index:999;
+    display:none;
+    overflow:hidden;
+    font-family:'Share Tech Mono', monospace;
+    color:#39ff14;
+  }
+  #meltdown.active{ display:block; }
+  .matrix-col{
+    position:absolute;
+    top:-100%;
+    font-size:16px;
+    line-height:1.1;
+    white-space:pre;
+    color:#39ff14;
+    text-shadow:0 0 6px #39ff14;
+    animation:fall linear infinite;
+  }
+  @keyframes fall{
+    from{ top:-100%; }
+    to{ top:100%; }
+  }
+  .glitch-flash{
+    position:absolute; inset:0;
+    background:#39ff14;
+    opacity:0;
+    mix-blend-mode:overlay;
+    animation:flash .12s steps(2) infinite;
+  }
+  @keyframes flash{
+    0%{ opacity:0; }
+    50%{ opacity:.25; }
+    100%{ opacity:0; }
+  }
+  .error-alert{
+    position:absolute;
+    background:#000;
+    border:2px solid #39ff14;
+    color:#39ff14;
+    font-family:'Share Tech Mono', monospace;
+    padding:10px 16px;
+    font-size:13px;
+    box-shadow:0 0 20px rgba(57,255,20,.6);
+    animation:pop .25s ease-out;
+    z-index:2;
+  }
+  @keyframes pop{ from{ transform:scale(.7); opacity:0;} to{ transform:scale(1); opacity:1; } }
+  .meltdown-title{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-family:'Share Tech Mono', monospace;
+    font-size:clamp(22px, 6vw, 48px);
+    color:#39ff14;
+    text-shadow:0 0 12px #39ff14, 0 0 30px #39ff14;
+    text-align:center;
+    z-index:3;
+    animation:jitter .08s infinite;
+    letter-spacing:.05em;
+  }
+  @keyframes jitter{
+    0%{ transform:translate(-50%,-50%) skewX(0deg); }
+    25%{ transform:translate(calc(-50% + 2px),-50%) skewX(2deg); }
+    50%{ transform:translate(calc(-50% - 2px),-50%) skewX(-2deg); }
+    75%{ transform:translate(-50%,calc(-50% + 1px)) skewX(1deg); }
+    100%{ transform:translate(-50%,-50%) skewX(0deg); }
+  }
+  .meltdown-sub{
+    position:absolute; top:62%; left:50%; transform:translate(-50%,-50%);
+    font-size:14px; color:#39ff14; opacity:.8; z-index:3;
+    font-family:'Share Tech Mono', monospace;
+  }
+  .close-meltdown{
+    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
+    z-index:4;
+    background:transparent;
+    border:1px solid #39ff14;
+    color:#39ff14;
+    font-family:'Share Tech Mono', monospace;
+    padding:8px 18px;
+    border-radius:0;
+    font-size:12px;
+    letter-spacing:.1em;
+  }
+
+  @media (max-width:420px){
+    .booth{ padding:30px 20px 26px; }
+    .wheel{ width:180px; height:180px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="booth">
+  <div class="eyebrow">STEP RIGHT UP</div>
+  <h1>The Wheel of Destiny</h1>
+  <p class="sub">Madame Voss sees what the year has hidden for you</p>
+  <div class="divider"></div>
+
+  <div class="wheel-wrap">
+    <div class="wheel-pointer"></div>
+    <div class="wheel" id="wheel">
+      <div class="wheel-center"></div>
+    </div>
+  </div>
+
+  <button id="spinBtn">Spin the Wheel</button>
+
+  <div class="fortune-box" id="fortuneBox"></div>
+
+  <div class="customize">
+    <label for="birthYear">CUSTOMIZE YOUR PREDICTION — ENTER BIRTH YEAR</label>
+    <select id="birthYear">
+      <option value="">Select a year</option>
+    </select>
+    <p class="customize-note">Your birth year fine-tunes the fortune's phrasing.</p>
+  </div>
+</div>
+
+<div id="meltdown">
+  <div class="glitch-flash"></div>
+  <div id="matrixLayer"></div>
+  <div class="meltdown-title">SYSTEM FAILURE — YEAR 2000 NOT FOUND</div>
+  <div class="meltdown-sub">CLOCK ROLLBACK DETECTED · REALITY.EXE HAS STOPPED RESPONDING</div>
+  <button class="close-meltdown" id="closeMeltdown">[ ACKNOWLEDGE ]</button>
+</div>
+
+<script>
+  // ambient stars
+  const starsWrap = document.getElementById('stars');
+  for(let i=0;i<60;i++){
+    const s = document.createElement('span');
+    s.style.left = Math.random()*100+'vw';
+    s.style.top = Math.random()*100+'vh';
+    s.style.animationDelay = (Math.random()*4)+'s';
+    starsWrap.appendChild(s);
+  }
+
+  // populate year dropdown
+  const yearSelect = document.getElementById('birthYear');
+  const thisYear = new Date().getFullYear();
+  for(let y = thisYear; y >= 1940; y--){
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    yearSelect.appendChild(opt);
+  }
+
+  // fortunes
+  const fortunes = [
+    "A door you assumed was locked will open on the first try.",
+    "Someone you haven't spoken to in months will reach out first.",
+    "A small risk this week pays off larger than expected.",
+    "You'll find something you weren't looking for — keep it.",
+    "An old plan resurfaces, better timed than before.",
+    "A conversation you're dreading turns out easier than feared.",
+    "Something you built quietly gets noticed publicly.",
+    "The next stranger you help will help you back, eventually."
+  ];
+
+  const wheel = document.getElementById('wheel');
+  const spinBtn = document.getElementById('spinBtn');
+  const fortuneBox = document.getElementById('fortuneBox');
+  let currentRotation = 0;
+  let spinning = false;
+
+  spinBtn.addEventListener('click', () => {
+    if(spinning) return;
+    spinning = true;
+    fortuneBox.classList.remove('show');
+    spinBtn.disabled = true;
+
+    const extraSpins = 5 + Math.floor(Math.random()*3);
+    const finalOffset = Math.floor(Math.random()*360);
+    currentRotation += extraSpins*360 + finalOffset;
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+    setTimeout(() => {
+      const fortune = fortunes[Math.floor(Math.random()*fortunes.length)];
+      fortuneBox.textContent = fortune;
+      fortuneBox.classList.add('show');
+      spinning = false;
+      spinBtn.disabled = false;
+    }, 3300);
+  });
+
+  // ===== the "customize" dropdown — secret trap =====
+  const meltdown = document.getElementById('meltdown');
+  const matrixLayer = document.getElementById('matrixLayer');
+  const closeMeltdown = document.getElementById('closeMeltdown');
+  const chars = "アカサタナ日ﾊﾏﾔﾗﾜ01ABCDEFY2K異常エラー0123456789";
+
+  function buildMatrixRain(){
+    matrixLayer.innerHTML = '';
+    const cols = Math.floor(window.innerWidth / 18);
+    for(let i=0;i<cols;i++){
+      const col = document.createElement('div');
+      col.className = 'matrix-col';
+      col.style.left = (i*18)+'px';
+      col.style.animationDuration = (2 + Math.random()*3)+'s';
+      col.style.animationDelay = (Math.random()*-5)+'s';
+      let text = '';
+      const len = 20 + Math.floor(Math.random()*20);
+      for(let j=0;j<len;j++){
+        text += chars[Math.floor(Math.random()*chars.length)] + '\n';
+      }
+      col.textContent = text;
+      matrixLayer.appendChild(col);
+    }
+  }
+
+  function spawnErrorAlerts(){
+    const messages = [
+      "ERR_Y2K_0x1999", "TIME.SYS CORRUPTED", "BUFFER OVERFLOW: YEAR FIELD",
+      "DATE ROLLOVER FAILURE", "MEMORY LEAK: CENTURY BIT", "REBOOTING KERNEL..."
+    ];
+    let count = 0;
+    const interval = setInterval(() => {
+      if(count >= 14 || !meltdown.classList.contains('active')){
+        clearInterval(interval);
+        return;
+      }
+      const el = document.createElement('div');
+      el.className = 'error-alert';
+      el.textContent = messages[Math.floor(Math.random()*messages.length)];
+      el.style.left = (Math.random()*70)+'%';
+      el.style.top = (Math.random()*80)+'%';
+      meltdown.appendChild(el);
+      setTimeout(() => el.remove(), 1400);
+      count++;
+    }, 220);
+  }
+
+  yearSelect.addEventListener('change', (e) => {
+    if(e.target.value === '1999'){
+      buildMatrixRain();
+      meltdown.classList.add('active');
+      spawnErrorAlerts();
+    }
+  });
+
+  closeMeltdown.addEventListener('click', () => {
+    meltdown.classList.remove('active');
+    yearSelect.value = '';
+  });
+
+  window.addEventListener('resize', () => {
+    if(meltdown.classList.contains('active')) buildMatrixRain();
+  });
+</script>
+
+</body>
+</html>
